@@ -1,0 +1,15 @@
+imports:
+    - { resource: tables.yml }
+
+services:
+    sheer.stopregister.listener:
+        class: sheer\stopregister\event\listener
+        arguments:
+            - @request
+            - @template
+            - @config
+            - @user
+            - @log
+            - %core.table_prefix%
+        tags:
+            - { name: event.listener }
