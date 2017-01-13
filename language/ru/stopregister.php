@@ -27,9 +27,9 @@ $lang = array_merge($lang, array(
 	'EMAIL_STOP'				=> 'Указанный адрес e-mail внесен в черный список сервиса <a href="http://www.stopforumspam.com" target = "_blank">www.stopforumspam.com</a><br />Попробуйте использовать другой',
 	'REPORT_STOP'				=> 'Если вы считаете, что это произошло по недоразумению, сообщите об этом %sадминистратору%s',
 	'ALLOW_STOPFORUMSPAM'		=> 'Включить',
-	'ALLOW_STOPFORUMSPAM_EXPLAIN'=> 'Если включено, то IP-адрес, имя пользователя и адрес e-mailбудут проверены по базе данных www.stopforumspam.com<br />Отключение <b>всех трех</b> нижеследющих параметров равносильно отключению этого параметра.',
+	'ALLOW_STOPFORUMSPAM_EXPLAIN'=> 'Если включено, то IP-адрес, имя пользователя и адрес e-mail будут проверены по базе данных www.stopforumspam.com<br />Отключение <b>всех трех</b> нижеследющих параметров равносильно отключению этого параметра.',
 	'ALLOW_REG_LOG'				=> 'Вести лог регистраций',
-	'CHECK_IP'					=> 'Проверять по IP-адресу',
+	'CHECK_SPAM_IP'				=> 'Проверять по IP-адресу',
 	'CHECK_USERNAME'			=> 'Проверять имя пользователя',
-	'CHECK_EMAIL'				=> 'Проверять адрес e-mail',
+	'CHECK_SPAM_EMAIL'			=> 'Проверять адрес e-mail',
 ));
