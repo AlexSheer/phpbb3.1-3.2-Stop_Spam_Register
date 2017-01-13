@@ -99,18 +99,17 @@ class listener implements EventSubscriberInterface
 		$report = array('ip' => $user->lang['IP_STOP'], 'username' => $user->lang['NICK_STOP'], 'email' => $user->lang['EMAIL_STOP']);
 		if ($this->config['enable_register_log'])
 		{
-			$log 	= array('ip' => 'IP_BLACKLIST', 'username' => 'NICK_BLACKLIST', 'email' => 'EMAIL_BLACKLIST');
+			$log = array('ip' => 'IP_BLACKLIST', 'username' => 'NICK_BLACKLIST', 'email' => 'EMAIL_BLACKLIST');
 			$this->phpbb_log->set_log_table(REGISTER_LOG_TABLE);
 		}
 
 		$ch_data = array(
 			($this->config['check_username']) ? $user_row['username'] : '',
 			($this->config['check_ip']) ?  $user_row['ip'] : '',
-			($this->config['check_username']) ? $user_row['email'] : '',
+			($this->config['check_email']) ? $user_row['email'] : '',
 		);
 
 		$result = $this->check_stopforumspam($ch_data);
-
 		if (sizeof($result))
 		{
 			foreach ($result as $key => $value)
@@ -135,7 +134,6 @@ class listener implements EventSubscriberInterface
 
 	public function add_sql_where($event)
 	{
-		//$event['sql_additional'] = '';
 		if($usearch = $this->request->variable('usearch', '', true))
 		{
 			$this->template->assign_var('USEARCH', $usearch);
@@ -167,7 +165,8 @@ class listener implements EventSubscriberInterface
 
 		if (is_array($arrObjData))
 		{
-			foreach ($arrObjData as $index => $value) {
+			foreach ($arrObjData as $index => $value)
+			{
 				if (is_object($value) || is_array($value))
 				{
 					$value = $this->objectsIntoArray($value, $arrSkipIndices);
@@ -276,9 +275,9 @@ class listener implements EventSubscriberInterface
 			$next = $count + 1;
 			$display_vars['vars']['legend' . $count . ''] = 'ACP_STOPFORUMSPAM';
 			$display_vars['vars']['enable_stopforumspam'] = array('lang' => 'ALLOW_STOPFORUMSPAM','validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => true);
-			$display_vars['vars']['check_ip'] = array('lang' => 'CHECK_IP', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
+			$display_vars['vars']['check_ip'] = array('lang' => 'CHECK_SPAM_IP', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
 			$display_vars['vars']['check_username'] = array('lang' => 'CHECK_USERNAME', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
-			$display_vars['vars']['check_email'] = array('lang' => 'CHECK_EMAIL', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
+			$display_vars['vars']['check_email'] = array('lang' => 'CHECK_SPAM_EMAIL', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
 			$display_vars['vars']['enable_register_log'] = array('lang' => 'ALLOW_REG_LOG', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
 			$display_vars['vars']['legend' . $next . ''] = 'ACP_SUBMIT_CHANGES';
 			$event['display_vars'] = $display_vars;
