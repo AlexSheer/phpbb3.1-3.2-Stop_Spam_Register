@@ -122,14 +122,11 @@ class listener implements EventSubscriberInterface
 					{
 						$this->phpbb_log->add('admin', $this->user->data['user_id'], $this->user->data['session_ip'], $log[$key], time(), $log_data);
 					}
+					$error[] = sprintf($user->lang['REPORT_STOP'], '<a href="mailto:' . htmlspecialchars($this->config['board_contact']) . '">', '</a>');
+					$event['error'] = $error;
 				}
 			}
-			if ($log_data)
-			{
-				$error[] = sprintf($user->lang['REPORT_STOP'], '<a href="mailto:' . htmlspecialchars($this->config['board_contact']) . '">', '</a>');
-			}
 		}
-		$event['error'] = $error;
 	}
 
 	public function add_sql_where($event)
@@ -153,34 +150,6 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	private function objectsIntoArray($arrObjData, $arrSkipIndices = array())
-	{
-		$arrData = array();
-
-		// if input is object, convert into array
-		if (is_object($arrObjData))
-		{
-			$arrObjData = get_object_vars($arrObjData);
-		}
-
-		if (is_array($arrObjData))
-		{
-			foreach ($arrObjData as $index => $value)
-			{
-				if (is_object($value) || is_array($value))
-				{
-					$value = $this->objectsIntoArray($value, $arrSkipIndices);
-				}
-				if (in_array($index, $arrSkipIndices))
-				{
-					continue;
-				}
-				$arrData[$index] = $value;
-			}
-		}
-		return $arrData;
-	}
-
 	private function check_stopforumspam($chk_data)
 	{
 		$chk_data[0] = str_replace(' ', '%20', $chk_data[0]);
@@ -194,6 +163,7 @@ class listener implements EventSubscriberInterface
 		$xmlUrl .= (!empty($chk_data[0])) ? 'username=' . $chk_data[0] . '&' : '';
 		$xmlUrl .= (!empty($chk_data[1])) ? 'ip=' . $chk_data[1] . '&' : '';
 		$xmlUrl .= (!empty($chk_data[2])) ? 'email=' . $chk_data[2] . '' : '';
+		$xmlUrl .= '&serial';
 
 		// Try to get data from stopforumspam
 		$xmlStr = @file_get_contents($xmlUrl);
@@ -204,23 +174,18 @@ class listener implements EventSubscriberInterface
 		}
 		if ($xmlStr)
 		{
-			$xmlObj = simplexml_load_string($xmlStr);
-			$arrXml = $this->objectsIntoArray($xmlObj);
-
-			if(sizeof ($arrXml['type']) == 1)
+			$data = unserialize($xmlStr);
+			if (!$data['success'])
 			{
-				$insp = array($arrXml['type'] => $arrXml['appears'] );
+				return false;
 			}
 
-			else if ($arrXml['@attributes']['success'] == true)
-			{
-				for ($i=0; $i < sizeof ($arrXml['type']); $i++)
-				{
-					$insp[$arrXml['type'][$i]] = $arrXml['appears'][$i];
-				}
+			$result = array();
+			$result['username'] = (isset($data['username']['appears']) && $data['username']['appears']) ? 'yes' : 'no';
+			$result['ip'] = (isset($data['ip']['appears']) && $data['ip']['appears']) ? 'yes' : 'no';
+			$result['email'] = (isset($data['email']['appears']) && $data['email']['appears']) ? 'yes' : 'no';
 
-			}
-			return($insp);
+			return $result;
 		}
 		else
 		{
@@ -286,6 +251,7 @@ class listener implements EventSubscriberInterface
 
 	public function add_log_register($event)
 	{
+		// To do - delete user if this is spamer, but sucess register
 		if ($this->config['enable_register_log'])
 		{
 			$log_data = array();
