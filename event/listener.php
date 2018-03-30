@@ -152,46 +152,35 @@ class listener implements EventSubscriberInterface
 
 	private function check_stopforumspam($chk_data)
 	{
+		$result = array();
 		$chk_data[0] = str_replace(' ', '%20', $chk_data[0]);
 		$insp = array();
-		if ($chk_data[0] == '' && $chk_data[1] == '' && $chk_data[2] == '')
+		if ($chk_data[0] != '' && $chk_data[1] != '' && $chk_data[2] != '')
 		{
-			return false;
-		}
+			$xmlUrl = 'http://api.stopforumspam.org/api?';
+			$xmlUrl .= (!empty($chk_data[0])) ? 'username=' . $chk_data[0] . '&' : '';
+			$xmlUrl .= (!empty($chk_data[1])) ? 'ip=' . $chk_data[1] . '&' : '';
+			$xmlUrl .= (!empty($chk_data[2])) ? 'email=' . $chk_data[2] . '' : '';
+			$xmlUrl .= '&serial';
 
-		$xmlUrl = 'http://api.stopforumspam.org/api?';
-		$xmlUrl .= (!empty($chk_data[0])) ? 'username=' . $chk_data[0] . '&' : '';
-		$xmlUrl .= (!empty($chk_data[1])) ? 'ip=' . $chk_data[1] . '&' : '';
-		$xmlUrl .= (!empty($chk_data[2])) ? 'email=' . $chk_data[2] . '' : '';
-		$xmlUrl .= '&serial';
-
-		// Try to get data from stopforumspam
-		$xmlStr = @file_get_contents($xmlUrl);
-		if(!$xmlStr)
-		{
-			// Fail get data via file_get_contents() - just try use curl
-			$xmlStr = $this->get_file($xmlUrl);
-		}
-		if ($xmlStr)
-		{
-			$data = unserialize($xmlStr);
-			if (!$data['success'])
+			// Try to get data from stopforumspam
+			$xmlStr = @file_get_contents($xmlUrl);
+			if (!$xmlStr)
 			{
-				return false;
+				// Fail get data via file_get_contents() - just try use curl
+				$xmlStr = $this->get_file($xmlUrl);
 			}
 
-			$result = array();
-			$result['username'] = (isset($data['username']['appears']) && $data['username']['appears']) ? 'yes' : 'no';
-			$result['ip'] = (isset($data['ip']['appears']) && $data['ip']['appears']) ? 'yes' : 'no';
-			$result['email'] = (isset($data['email']['appears']) && $data['email']['appears']) ? 'yes' : 'no';
+			$data = unserialize($xmlStr);
+			if ($data['success'])
+			{
+				$result['username'] = (isset($data['username']['appears']) && $data['username']['appears']) ? 'yes' : 'no';
+				$result['ip'] = (isset($data['ip']['appears']) && $data['ip']['appears']) ? 'yes' : 'no';
+				$result['email'] = (isset($data['email']['appears']) && $data['email']['appears']) ? 'yes' : 'no';
+			}
+		}
 
-			return $result;
-		}
-		else
-		{
-			// Cannot get data - skip check
-			return false;
-		}
+		return $result;
 	}
 
 	// use curl to get response from SFS
