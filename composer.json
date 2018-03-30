@@ -2,14 +2,14 @@
     "name": "sheer/stopregister",
     "type": "phpbb-extension",
     "description": "Stop spamer register",
-    "homepage": "http://www.phpbbguru.net/community/",
-    "version": "1.0.0",
-    "time": "2017-01-12",
+    "homepage": "https://www.phpbbguru.net/community/",
+    "version": "1.0.1",
+    "time": "2018-03-30",
     "license": "GPL-2.0",
     "authors": [
         {
             "name": "Sheer",
-            "homepage": "http://www.phpbbguru.net/community/",
+            "homepage": "https://www.phpbbguru.net/community/",
             "role": "Developer"
         }
     ],
@@ -23,6 +23,12 @@
         "display-name": "Stop spamer register",
         "soft-require": {
             "phpbb/phpbb": "3.1.*@dev"
+        },
+        "version-check": {
+            "host": "sheer.phpbbguru.net",
+            "ssl": true,
+            "directory": "/versions/stopregister",
+            "filename": "version.json"
         }
     }
 }
