@@ -90,13 +90,11 @@ class listener implements EventSubscriberInterface
 			return;
 		}
 
-		global $user;
-
 		$user_row = $event['data'];
 		$user_row['ip'] = $user->data['session_ip'];
 		$error = $event['error'];
 		$log_data = false;
-		$report = array('ip' => $user->lang['IP_STOP'], 'username' => $user->lang['NICK_STOP'], 'email' => $user->lang['EMAIL_STOP']);
+		$report = array('ip' => $this->user->lang['IP_STOP'], 'username' => $this->user->lang['NICK_STOP'], 'email' => $this->user->lang['EMAIL_STOP']);
 		if ($this->config['enable_register_log'])
 		{
 			$log = array('ip' => 'IP_BLACKLIST', 'username' => 'NICK_BLACKLIST', 'email' => 'EMAIL_BLACKLIST');
@@ -122,7 +120,7 @@ class listener implements EventSubscriberInterface
 					{
 						$this->phpbb_log->add('admin', $this->user->data['user_id'], $this->user->data['session_ip'], $log[$key], time(), $log_data);
 					}
-					$error[] = sprintf($user->lang['REPORT_STOP'], '<a href="mailto:' . htmlspecialchars($this->config['board_contact']) . '">', '</a>');
+					$error[] = sprintf($this->user->lang['REPORT_STOP'], '<a href="mailto:' . htmlspecialchars($this->config['board_contact']) . '">', '</a>');
 					$event['error'] = $error;
 				}
 			}
@@ -155,7 +153,7 @@ class listener implements EventSubscriberInterface
 		$result = array();
 		$chk_data[0] = str_replace(' ', '%20', $chk_data[0]);
 		$insp = array();
-		if ($chk_data[0] != '' && $chk_data[1] != '' && $chk_data[2] != '')
+		if ($chk_data[0] != '' || $chk_data[1] != '' || $chk_data[2] != '')
 		{
 			$xmlUrl = 'http://api.stopforumspam.org/api?';
 			$xmlUrl .= (!empty($chk_data[0])) ? 'username=' . $chk_data[0] . '&' : '';
