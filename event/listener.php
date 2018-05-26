@@ -91,7 +91,7 @@ class listener implements EventSubscriberInterface
 		}
 
 		$user_row = $event['data'];
-		$user_row['ip'] = $user->data['session_ip'];
+		$user_row['ip'] = $this->user->data['session_ip'];
 		$error = $event['error'];
 		$log_data = false;
 		$report = array('ip' => $this->user->lang['IP_STOP'], 'username' => $this->user->lang['NICK_STOP'], 'email' => $this->user->lang['EMAIL_STOP']);
