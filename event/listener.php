@@ -30,6 +30,7 @@ class listener implements EventSubscriberInterface
 			'core.acp_board_config_edit_add'	=> 'add_acp_config',
 			'core.get_logs_modify_type'			=> 'add_sql_where',
 			'core.ucp_register_user_row_after'	=> 'add_log_register',
+			'core.posting_modify_submit_post_before' => 'posting_before'
 		);
 	}
 
@@ -81,6 +82,34 @@ class listener implements EventSubscriberInterface
 			'lang_set' => 'stopregister',
 		);
 		$event['lang_set_ext'] = $lang_set_ext;
+	}
+
+	public function posting_before($event)
+	{
+		$post_data = $event['post_data'];
+
+		if ($post_data['poster_id'] == ANONYMOUS)
+		{
+			$user_ip = $this->user->data['session_ip'];
+			if (!$this->config['enable_stopforumspam'])
+			{
+				return;
+			}
+
+			$ch_data = array($post_data['username'], $user_ip);
+			$result = $this->check_stopforumspam($ch_data);
+
+			if (sizeof($result))
+			{
+				foreach ($result as $key => $value)
+				{
+					if ($value == 'yes')
+					{
+						trigger_error('SPAM');
+					}
+				}
+			}
+		}
 	}
 
 	public function chk_user_data($event)
