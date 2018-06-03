@@ -3,8 +3,8 @@
     "type": "phpbb-extension",
     "description": "Stop spamer register",
     "homepage": "https://www.phpbbguru.net/community/",
-    "version": "1.0.1",
-    "time": "2018-03-30",
+    "version": "1.0.2",
+    "time": "2018-05-27",
     "license": "GPL-2.0",
     "authors": [
         {
