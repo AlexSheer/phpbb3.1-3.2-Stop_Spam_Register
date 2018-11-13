@@ -185,7 +185,7 @@ class listener implements EventSubscriberInterface
 		if ($chk_data[0] != '' || $chk_data[1] != '' || $chk_data[2] != '')
 		{
 			$xmlUrl = 'http://api.stopforumspam.org/api?';
-			$xmlUrl .= (!empty($chk_data[0])) ? 'username=' . $chk_data[0] . '&' : '';
+			$xmlUrl .= (!empty($chk_data[0])) ? 'username=' . urlencode(iconv('GBK', 'UTF-8', $chk_data[0])) . '&' : '';
 			$xmlUrl .= (!empty($chk_data[1])) ? 'ip=' . $chk_data[1] . '&' : '';
 			$xmlUrl .= (!empty($chk_data[2])) ? 'email=' . $chk_data[2] . '' : '';
 			$xmlUrl .= '&serial';
