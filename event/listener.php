@@ -49,6 +49,9 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\log\log_interface */
 	protected $log;
 
+	/** @var \phpbb\db\driver\driver_interface $db */
+	protected $db;
+
 /**
 * Constructor
 */
@@ -58,6 +61,7 @@ class listener implements EventSubscriberInterface
 		\phpbb\config\config $config,
 		\phpbb\user $user,
 		\phpbb\log\log_interface $log,
+		\phpbb\db\driver\driver_interface $db,
 		$table_prefix
 	)
 	{
@@ -66,6 +70,7 @@ class listener implements EventSubscriberInterface
 		$this->config = $config;
 		$this->user = $user;
 		$this->phpbb_log = $log;
+		$this->db = $db;
 		$this->table_prefix = $table_prefix;
 
 		if (!defined('REGISTER_LOG_TABLE'))
@@ -158,13 +163,13 @@ class listener implements EventSubscriberInterface
 
 	public function add_sql_where($event)
 	{
-		if($usearch = $this->request->variable('usearch', '', true))
+		if ($usearch = $this->request->variable('usearch', '', true))
 		{
 			$this->template->assign_var('USEARCH', $usearch);
 			$event['sql_additional'] .= " AND u.username_clean " . $this->db->sql_like_expression(str_replace('*', $this->db->get_any_char(), utf8_clean_string($usearch))) . ' ';
 		}
 
-		if($isearch = $this->request->variable('isearch', ''))
+		if ($isearch = $this->request->variable('isearch', ''))
 		{
 			$this->template->assign_var('ISEARCH', $isearch);
 			$event['sql_additional'] .= " AND l.log_ip " . $this->db->sql_like_expression(str_replace('*', $this->db->get_any_char(), $isearch)) . ' ';
