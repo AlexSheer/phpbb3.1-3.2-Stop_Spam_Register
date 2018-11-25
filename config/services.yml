@@ -10,6 +10,7 @@ services:
             - @config
             - @user
             - @log
+            - @dbal.conn
             - %core.table_prefix%
         tags:
             - { name: event.listener }
