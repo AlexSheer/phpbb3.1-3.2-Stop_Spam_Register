@@ -16,9 +16,12 @@ class main_module
 	function main($id, $mode)
 	{
 		global $db, $template, $request, $table_prefix, $user, $phpbb_log, $phpbb_container, $config, $phpbb_root_path, $phpEx;
+
 		$user->add_lang('mcp');
 
-		$phpbb_log->set_log_table(REGISTER_LOG_TABLE);
+		$log_table = $phpbb_container->getParameter('tables.register_log');
+
+		$phpbb_log->set_log_table($log_table);
 
 		$whois		= $request->variable('whois', false);
 
@@ -27,6 +30,7 @@ class main_module
 		$deleteall	= $request->variable('delall', false, false, \phpbb\request\request_interface::POST);
 		$marked		= $request->variable('mark', array(0));
 		$asearch	= $request->variable('asearch', 'ACP_LOGS_ALL');
+		//print "$asearch<br />";
 
 		// Sort keys
 		$sort_days	= $request->variable('st', 0);
@@ -63,13 +67,18 @@ class main_module
 
 				if ($deletemark && sizeof($marked))
 				{
-					$sql = 'DELETE FROM ' . REGISTER_LOG_TABLE . '
+					$sql = 'DELETE FROM ' . $log_table . '
 						WHERE ' . $db->sql_in_set('log_id', $marked) . '';
 				}
 
-				if ($deleteall)
+				if ($deleteall && $asearch === 'ACP_LOGS_ALL')
 				{
-					$sql = 'TRUNCATE TABLE ' . REGISTER_LOG_TABLE;
+					$sql = 'TRUNCATE TABLE ' . $log_table;
+				}
+				else
+				{
+					$sql = 'DELETE FROM ' . $log_table . '
+						WHERE log_operation = \'' . $asearch . '\'';
 				}
 
 				$db->sql_query($sql);
@@ -89,6 +98,7 @@ class main_module
 					'sd'		=> $sort_dir,
 					'i'			=> $id,
 					'mode'		=> $mode,
+					'asearch'	=> $asearch,
 					))
 				);
 			}
