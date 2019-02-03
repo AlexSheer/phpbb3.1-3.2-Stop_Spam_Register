@@ -32,4 +32,6 @@ $lang = array_merge($lang, array(
 	'CHECK_SPAM_IP'				=> 'Проверять по IP-адресу',
 	'CHECK_USERNAME'			=> 'Проверять имя пользователя',
 	'CHECK_SPAM_EMAIL'			=> 'Проверять адрес e-mail',
+	'SFSL_PRUNE_DAY'=> 'Автоочистка лога',
+	'SFSL_PRUNE_DAY_EXPLAIN'=> 'За какое время в сутках хранить данные. Нулевое значение отключает автоматическую очистку лога.',
 ));
