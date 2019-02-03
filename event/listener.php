@@ -62,21 +62,21 @@ class listener implements EventSubscriberInterface
 		\phpbb\user $user,
 		\phpbb\log\log_interface $log,
 		\phpbb\db\driver\driver_interface $db,
-		$table_prefix
+		$sfs_log_table
 	)
 	{
-		$this->request = $request;
-		$this->template = $template;
-		$this->config = $config;
-		$this->user = $user;
-		$this->phpbb_log = $log;
-		$this->db = $db;
-		$this->table_prefix = $table_prefix;
+		$this->request				= $request;
+		$this->template				= $template;
+		$this->config				= $config;
+		$this->user					= $user;
+		$this->phpbb_log			= $log;
+		$this->db					= $db;
+		$this->sfs_log				= $sfs_log_table;
 
-		if (!defined('REGISTER_LOG_TABLE'))
+/*		if (!defined('REGISTER_LOG_TABLE'))
 		{
 			define ('REGISTER_LOG_TABLE', $this->table_prefix . 'register_log');
-		}
+		}*/
 	}
 
 	public function load_language_on_setup($event)
@@ -132,7 +132,7 @@ class listener implements EventSubscriberInterface
 		if ($this->config['enable_register_log'])
 		{
 			$log = array('ip' => 'IP_BLACKLIST', 'username' => 'NICK_BLACKLIST', 'email' => 'EMAIL_BLACKLIST');
-			$this->phpbb_log->set_log_table(REGISTER_LOG_TABLE);
+			$this->phpbb_log->set_log_table($this->sfs_log);
 		}
 
 		$ch_data = array(
@@ -177,7 +177,7 @@ class listener implements EventSubscriberInterface
 
 		if ($asearch =  $this->request->variable('asearch', ''))
 		{
-			$event['sql_additional'] .= ($asearch != 'ACP_LOGS_ALL') ? ' AND l.log_operation LIKE \''. $asearch .'\'' : '';
+			$event['sql_additional'] .= ($asearch != 'ACP_LOGS_ALL') ? ' AND l.log_operation LIKE \'' . $asearch . '\'' : '';
 			$this->template->assign_var('ASEARCH', $asearch);
 		}
 	}
@@ -265,6 +265,7 @@ class listener implements EventSubscriberInterface
 			$display_vars['vars']['check_username'] = array('lang' => 'CHECK_USERNAME', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
 			$display_vars['vars']['check_email'] = array('lang' => 'CHECK_SPAM_EMAIL', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
 			$display_vars['vars']['enable_register_log'] = array('lang' => 'ALLOW_REG_LOG', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false);
+			$display_vars['vars']['sfsl_expire_days'] = array('lang' => 'SFSL_PRUNE_DAY', 'validate' => 'int:0:60', 'type' => 'number:0:9999', 'explain' => true, 'append' => ' ' . $this->user->lang['DAYS']);
 			$display_vars['vars']['legend' . $next . ''] = 'ACP_SUBMIT_CHANGES';
 			$event['display_vars'] = $display_vars;
 		}
@@ -272,12 +273,11 @@ class listener implements EventSubscriberInterface
 
 	public function add_log_register($event)
 	{
-		// To do - delete user if this is spamer, but sucess register
 		if ($this->config['enable_register_log'])
 		{
 			$log_data = array();
 			$user_row = $event['user_row'];
-			$this->phpbb_log->set_log_table(REGISTER_LOG_TABLE);
+			$this->phpbb_log->set_log_table($this->sfs_log);
 			$this->phpbb_log->add('admin', $this->user->data['user_id'], $user_row['user_ip'], 'REGISTER_SUCSESS', $user_row['user_regdate'], array($user_row['username']));
 		}
 	}
