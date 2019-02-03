@@ -5,12 +5,25 @@ services:
     sheer.stopregister.listener:
         class: sheer\stopregister\event\listener
         arguments:
-            - @request
-            - @template
-            - @config
-            - @user
-            - @log
-            - @dbal.conn
-            - %core.table_prefix%
+            - '@request'
+            - '@template'
+            - '@config'
+            - '@user'
+            - '@log'
+            - '@dbal.conn'
+            - '%tables.register_log%'
         tags:
             - { name: event.listener }
+
+    sheer.stopregister.cron.task.cron_task:
+        class: sheer\stopregister\cron\task\cron_task
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@user'
+            - '@log'
+            - '%tables.register_log%'
+        calls:
+            - [set_name, [cron.task.cron_task]]
+        tags:
+            - { name: cron.task }
