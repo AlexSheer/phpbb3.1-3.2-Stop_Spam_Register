@@ -64,21 +64,17 @@ class main_module
 			if (confirm_box(true))
 			{
 				$conditions = array();
+				$sql_where = ($asearch === 'ACP_LOGS_ALL') ? '' : ' AND log_operation = \'' . $asearch . '\'';
 
 				if ($deletemark && sizeof($marked))
 				{
 					$sql = 'DELETE FROM ' . $log_table . '
-						WHERE ' . $db->sql_in_set('log_id', $marked) . '';
+						WHERE ' . $db->sql_in_set('log_id', $marked) . $sql_where;
 				}
 
-				if ($deleteall && $asearch === 'ACP_LOGS_ALL')
+				if ($deleteall)
 				{
 					$sql = 'TRUNCATE TABLE ' . $log_table;
-				}
-				else
-				{
-					$sql = 'DELETE FROM ' . $log_table . '
-						WHERE log_operation = \'' . $asearch . '\'';
 				}
 
 				$db->sql_query($sql);
