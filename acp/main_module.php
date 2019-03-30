@@ -72,9 +72,14 @@ class main_module
 						WHERE ' . $db->sql_in_set('log_id', $marked) . $sql_where;
 				}
 
-				if ($deleteall)
+				if ($deleteall && $asearch === 'ACP_LOGS_ALL')
 				{
 					$sql = 'TRUNCATE TABLE ' . $log_table;
+				}
+				else if ($deleteall)
+				{
+					$sql = 'DELETE FROM ' . $log_table . '
+						WHERE log_operation = \'' . $asearch . '\'';
 				}
 
 				$db->sql_query($sql);
