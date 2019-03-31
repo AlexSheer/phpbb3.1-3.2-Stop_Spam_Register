@@ -30,7 +30,7 @@ class main_module
 		$deleteall	= $request->variable('delall', false, false, \phpbb\request\request_interface::POST);
 		$marked		= $request->variable('mark', array(0));
 		$asearch	= $request->variable('asearch', 'ACP_LOGS_ALL');
-		//print "$asearch<br />";
+		$isearch	= $request->variable('isearch', '');
 
 		// Sort keys
 		$sort_days	= $request->variable('st', 0);
@@ -63,23 +63,23 @@ class main_module
 		{
 			if (confirm_box(true))
 			{
-				$conditions = array();
-				$sql_where = ($asearch === 'ACP_LOGS_ALL') ? '' : ' AND log_operation = \'' . $asearch . '\'';
+				$sql_where = '';
+				$sql_where .= ($asearch === 'ACP_LOGS_ALL') ? '' : ' AND log_operation = \'' . $asearch . '\'';
+				$sql_where .= (!$isearch) ? '' : ' AND log_ip = \'' . $isearch . '\'';
 
 				if ($deletemark && sizeof($marked))
 				{
 					$sql = 'DELETE FROM ' . $log_table . '
 						WHERE ' . $db->sql_in_set('log_id', $marked) . $sql_where;
 				}
-
-				if ($deleteall && $asearch === 'ACP_LOGS_ALL')
+				if ($deleteall && ($asearch === 'ACP_LOGS_ALL') && (!$isearch))
 				{
 					$sql = 'TRUNCATE TABLE ' . $log_table;
 				}
 				else if ($deleteall)
 				{
 					$sql = 'DELETE FROM ' . $log_table . '
-						WHERE log_operation = \'' . $asearch . '\'';
+						WHERE log_id <> 0 ' . $sql_where . '';
 				}
 
 				$db->sql_query($sql);
@@ -100,6 +100,7 @@ class main_module
 					'i'			=> $id,
 					'mode'		=> $mode,
 					'asearch'	=> $asearch,
+					'isearch'	=> $isearch,
 					))
 				);
 			}
