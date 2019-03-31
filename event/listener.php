@@ -72,11 +72,6 @@ class listener implements EventSubscriberInterface
 		$this->phpbb_log			= $log;
 		$this->db					= $db;
 		$this->sfs_log				= $sfs_log_table;
-
-/*		if (!defined('REGISTER_LOG_TABLE'))
-		{
-			define ('REGISTER_LOG_TABLE', $this->table_prefix . 'register_log');
-		}*/
 	}
 
 	public function load_language_on_setup($event)
@@ -163,19 +158,13 @@ class listener implements EventSubscriberInterface
 
 	public function add_sql_where($event)
 	{
-		if ($usearch = $this->request->variable('usearch', '', true))
-		{
-			$this->template->assign_var('USEARCH', $usearch);
-			$event['sql_additional'] .= " AND u.username_clean " . $this->db->sql_like_expression(str_replace('*', $this->db->get_any_char(), utf8_clean_string($usearch))) . ' ';
-		}
-
 		if ($isearch = $this->request->variable('isearch', ''))
 		{
 			$this->template->assign_var('ISEARCH', $isearch);
 			$event['sql_additional'] .= " AND l.log_ip " . $this->db->sql_like_expression(str_replace('*', $this->db->get_any_char(), $isearch)) . ' ';
 		}
 
-		if ($asearch =  $this->request->variable('asearch', ''))
+		if ($asearch = $this->request->variable('asearch', ''))
 		{
 			$event['sql_additional'] .= ($asearch != 'ACP_LOGS_ALL') ? ' AND l.log_operation LIKE \'' . $asearch . '\'' : '';
 			$this->template->assign_var('ASEARCH', $asearch);
