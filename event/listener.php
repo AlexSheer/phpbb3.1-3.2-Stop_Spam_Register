@@ -25,12 +25,12 @@ class listener implements EventSubscriberInterface
 	static public function getSubscribedEvents()
 	{
 		return array(
-			'core.user_setup'					=> 'load_language_on_setup',
-			'core.ucp_register_data_after'		=> 'chk_user_data',
-			'core.acp_board_config_edit_add'	=> 'add_acp_config',
-			'core.get_logs_modify_type'			=> 'add_sql_where',
-			'core.ucp_register_user_row_after'	=> 'add_log_register',
-			'core.posting_modify_submit_post_before' => 'posting_before'
+			'core.user_setup'							=> 'load_language_on_setup',
+			'core.ucp_register_data_after'				=> 'chk_user_data',
+			'core.acp_board_config_edit_add'			=> 'add_acp_config',
+			'core.get_logs_modify_type'					=> 'add_sql_where',
+			'core.ucp_register_welcome_email_before'	=> 'add_log_register',
+			'core.posting_modify_submit_post_before'	=> 'posting_before'
 		);
 	}
 
@@ -52,6 +52,12 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\db\driver\driver_interface $db */
 	protected $db;
 
+	/** @var string phpbb_root_path */
+	protected $phpbb_root_path;
+
+	/** @var string phpEx */
+	protected $php_ext;
+
 /**
 * Constructor
 */
@@ -62,6 +68,8 @@ class listener implements EventSubscriberInterface
 		\phpbb\user $user,
 		\phpbb\log\log_interface $log,
 		\phpbb\db\driver\driver_interface $db,
+		$phpbb_root_path,
+		$php_ext,
 		$sfs_log_table
 	)
 	{
@@ -71,6 +79,8 @@ class listener implements EventSubscriberInterface
 		$this->user					= $user;
 		$this->phpbb_log			= $log;
 		$this->db					= $db;
+		$this->phpbb_root_path		= $phpbb_root_path;
+		$this->php_ext				= $php_ext;
 		$this->sfs_log				= $sfs_log_table;
 	}
 
@@ -267,7 +277,22 @@ class listener implements EventSubscriberInterface
 			$log_data = array();
 			$user_row = $event['user_row'];
 			$this->phpbb_log->set_log_table($this->sfs_log);
-			$this->phpbb_log->add('admin', $this->user->data['user_id'], $user_row['user_ip'], 'REGISTER_SUCSESS', $user_row['user_regdate'], array($user_row['username']));
+			$user_row['user_id'] = $this->find_user_id_by_name($user_row['username']);
+			$url = '<a href = "./../memberlist.' . $this->php_ext . '?mode=viewprofile&u=' . $user_row['user_id'] . '">' . $user_row['username'] . '</a>';
+			$this->phpbb_log->add('admin', $this->user->data['user_id'], $user_row['user_ip'], 'REGISTER_SUCSESS', $user_row['user_regdate'], array($url));
 		}
+	}
+
+	private function find_user_id_by_name($username)
+	{
+		$sql = 'SELECT user_id FROM ' . USERS_TABLE . ' WHERE username_clean = \'' . utf8_clean_string($username) . '\'';
+		$result = $this->db->sql_query_limit($sql, 1);
+		$user_id = $this->db->sql_fetchfield('user_id');
+		$this->db->sql_freeresult($result);
+		if ($user_id == null)
+		{
+			$user_id = 1;
+		}
+		return $user_id;
 	}
 }
