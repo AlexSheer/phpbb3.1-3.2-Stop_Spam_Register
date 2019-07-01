@@ -11,6 +11,8 @@ services:
             - '@user'
             - '@log'
             - '@dbal.conn'
+            - '%core.root_path%'
+            - '%core.php_ext%'
             - '%tables.register_log%'
         tags:
             - { name: event.listener }
