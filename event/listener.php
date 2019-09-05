@@ -159,7 +159,7 @@ class listener implements EventSubscriberInterface
 					{
 						$this->phpbb_log->add('admin', $this->user->data['user_id'], $this->user->data['session_ip'], $log[$key], time(), $log_data);
 					}
-					$error[] = sprintf($this->user->lang['REPORT_STOP'], '<a href="mailto:' . htmlspecialchars($this->config['board_contact']) . '">', '</a>');
+					$error[] = $this->user->lang['REPORT_STOP'];
 					$event['error'] = $error;
 				}
 			}
