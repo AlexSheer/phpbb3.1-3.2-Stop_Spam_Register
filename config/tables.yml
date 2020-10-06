@@ -1,2 +1,2 @@
 parameters:
-    tables.register_log: %core.table_prefix%register_log
+    tables.register_log: '%core.table_prefix%register_log'
