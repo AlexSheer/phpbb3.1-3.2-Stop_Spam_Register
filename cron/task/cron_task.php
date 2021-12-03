@@ -61,7 +61,7 @@ class cron_task extends \phpbb\cron\task\base
 			$diff = time() - ($this->config['sfsl_expire_days'] * 86400);
 			$sql = 'DELETE FROM ' . $this->sfs_log . ' WHERE log_time < ' . $diff . '';
 			$this->db->sql_query($sql);
-			$this->phpbb_log->add('admin', $this->user->data['user_id'], $this->user->data['session_ip'], 'LOG_CLEAR_REGISTER_LOG', time(), false);
+			$this->phpbb_log->add('admin', $this->user->data['user_id'], $this->user->data['session_ip'] ?? '', 'LOG_CLEAR_REGISTER_LOG', time(), false);
 
 			// Update the cron task run time here if it hasn't
 			// already been done by cron actions.
